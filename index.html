@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinecone Agent Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @import url("data:text/css,%40font-face%7Bfont-family%3A%22ZSFT-bp%22%3Bsrc%3Aurl(%22https%3A%2F%2Ffontsapi.zeoseven.com%2Fbp%2Fmain.woff2%22)%20format(%22woff2%22)%2Curl(%22https%3A%2F%2Ffontsapi-storage.zeoseven.com%2Fbp%2Fmain.woff2%22)%20format(%22woff2%22)%3Bfont-style%3Anormal%3Bfont-weight%3A400%3Bfont-display%3Aswap%3B%7D");
+        
+        :root {
+            /* Cozy Palette */
+            --bg-main: #FDF8F2; /* Warm Cream */
+            --bg-card: #FFFFFF;
+            --text-primary: #5A4D4D; /* Muted Brown */
+            --text-secondary: #8B7E7E; /* Softer Brown */
+            --accent-user: #FDE8E8; /* Soft Rose */
+            --accent-agent: #E8F0FD; /* Pale Blue */
+            --accent-action: #F3E6F3; /* Gentle Lavender */
+            --accent-action-hover: #E9D8E9; /* Darker Lavender */
+            --shadow-light: #FFFFFF;
+            --shadow-dark: #EAE0D7; /* Warm Shadow */
+
+            /* Typography */
+            --font-family-sans: 'Inter', sans-serif;
+            --font-family-serif: 'Lora', serif;
+        }
+
+        /* Base Styles */
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: var(--font-family-sans);
+        }
+
+        h1, h2, h3 {
+             font-family: 'ZSFT-bp', var(--font-family-serif);
+             color: #8c7b7b; /* A soft, lavender-infused brown for the jelly effect */
+             text-shadow: 1px 1px 2px var(--shadow-dark), 
+                          -1px -1px 2px var(--shadow-light); /* Soft 3D/neumorphic shadow */
+        }
+        
+        /* Components */
+        .card-soft {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid #F3ECE7;
+            box-shadow: 4px 4px 12px rgba(188, 172, 158, 0.15);
+        }
+
+        .btn-soft-3d {
+            background-color: var(--accent-action);
+            border-radius: 12px;
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            transition: all 0.15s ease-in-out;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .btn-soft-3d:hover:not(:disabled) {
+            background-color: var(--accent-action-hover);
+        }
+        .btn-soft-3d:active:not(:disabled) {
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            font-size: 0.98em;
+        }
+        .btn-soft-3d:disabled {
+            background-color: #F8F5F2;
+            color: #C0B6AF;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .input-soft {
+            background-color: var(--bg-main);
+            border: 1px solid #F3ECE7;
+            border-radius: 16px;
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+        }
+        .input-soft:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 2px var(--accent-action-hover);
+        }
+
+        /* Utilities & Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 2s linear infinite;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--shadow-dark);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D1C5BC;
+        }
+        
+        /* Utility to hide scrollbars */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.23.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

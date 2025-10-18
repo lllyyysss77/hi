@@ -1,0 +1,5 @@
+{
+  "name": "Pinecone Agent Chat",
+  "description": "An agent chat interface that uses a simulated Pinecone database for persistent memory, allowing for context-aware conversations. The agent has full control over its memory bank.",
+  "requestFramePermissions": []
+}
